@@ -1,8 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
-const nombre = ref('')
+const paciente = reactive({
+  nombre: '',
+  propietario: '',
+  email: '',
+  alta: '',
+  sintomas: ''
+})
 
+const validar = () => {
+  console.log('Validando...')
+}
 </script>
 
 <template>
@@ -15,6 +24,7 @@ const nombre = ref('')
 
         <form
             class="bg-white shadow-md rounded-lg py-10 px-5 mb-10"
+            @submit.prevent="validar"
         >
             <div class="mb-5">
                 <label
@@ -28,6 +38,7 @@ const nombre = ref('')
                     type="text"
                     placeholder="Nombre de la mascota"
                     class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+                    v-model="paciente.nombre"
                 />
             </div>
 
@@ -43,6 +54,7 @@ const nombre = ref('')
                     type="text"
                     placeholder="Nombre del propietario"
                     class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+                    v-model="paciente.propietario"
                 />
             </div>
 
@@ -58,6 +70,7 @@ const nombre = ref('')
                     type="email"
                     placeholder="Email del propietario"
                     class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+                    v-model="paciente.email"
                 />
             </div>
 
@@ -71,7 +84,8 @@ const nombre = ref('')
                 <input
                     id="alta"
                     type="date"
-                    class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md mb-10"
+                    class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
+                    v-model="paciente.alta"
                 />
             </div>
 
@@ -87,6 +101,7 @@ const nombre = ref('')
                     type="text"
                     placeholder="Describe los síntomas de la mascota"
                     class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md h-40"
+                    v-model="paciente.sintomas"
                 />
             </div>
 
