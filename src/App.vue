@@ -1,5 +1,6 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
+import { uid } from 'uid'
 import Header from './components/Header.vue'
 import Formulario from './components/Formulario.vue'
 import Paciente from './components/Paciente.vue'
@@ -7,6 +8,7 @@ import Paciente from './components/Paciente.vue'
 const pacientes = ref([])
 
 const paciente = reactive({
+  id: null,
   nombre: '',
   propietario: '',
   email: '',
@@ -14,27 +16,52 @@ const paciente = reactive({
   sintomas: ''
 })
 
+watch(pacientes, () => {
+  guardarLocalStorage()
+}, {
+  deep: true
+})
+
+const guardarLocalStorage = () => {
+  localStorage.setItem('pacientes', JSON.stringify(pacientes.value))
+}
+
+onMounted(() => {
+  const pacientesStorage = localStorage.getItem('pacientes')
+  if (pacientesStorage) {
+    pacientes.value = JSON.parse(pacientesStorage)
+  }
+})
+
 const guardarPaciente = () => {
-  pacientes.value.push({
-    ...paciente
-  })
+  if (paciente.id) {
+    const { id } = paciente
+    const i = pacientes.value.findIndex(paciente => paciente.id === id)
+    pacientes.value[i] = {...paciente}
+  } else {
+    pacientes.value.push({
+      ...paciente,
+      id: uid()
+    })
+  }
 
-  // Reinciar el objeto
-  // paciente.nombre = ''
-  // paciente.propietario = ''
-  // paciente.email = ''
-  // paciente.alta = ''
-  // paciente.sintomas = ''
-
-  // Otra forma
   Object.assign(paciente, {
+    id: null,
     nombre: '',
     propietario: '',
     email: '',
     alta: '',
     sintomas: ''
   })
+}
 
+const actualizarPaciente = (id) => {
+  const pacienteEditar = pacientes.value.filter(paciente => paciente.id === id)[0]
+  Object.assign(paciente, pacienteEditar)
+}
+
+const eliminarPaciente = (id) => {
+  pacientes.value = pacientes.value.filter(paciente => paciente.id !== id)
 }
 </script>
 
@@ -50,6 +77,7 @@ const guardarPaciente = () => {
         v-model:alta="paciente.alta"
         v-model:sintomas="paciente.sintomas"
         @guardar-paciente="guardarPaciente"
+        :id="paciente.id"
       />
 
       <div class="md:w-1/2 md:h-screen overflow-y-scroll">
@@ -63,6 +91,8 @@ const guardarPaciente = () => {
             <Paciente
               v-for="paciente in pacientes"
               :paciente="paciente"
+              @actualizar-paciente="actualizarPaciente"
+              @eliminar-paciente="eliminarPaciente"
             />
 
           </div>
